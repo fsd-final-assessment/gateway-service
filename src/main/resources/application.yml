@@ -1,7 +1,12 @@
+spring:
+   profiles: 
+      active: dev
+---
 server:
    port: 8000
 
 spring:
+   profiles: dev
    application: 
       name: gateway-service
    datasource:
@@ -17,6 +22,79 @@ eureka:
       fetchRegistry: true
       serviceUrl: 
          defaultZone: http://localhost:8761/eureka/
+   instance:
+      leaseRenewalIntervalInSeconds: 1
+      leaseExpirationDurationInSeconds: 2
+
+zuul:
+   host:
+      connect-timeout-millis: 5000
+      max-per-route-connections: 10000
+      max-total-connections: 5000
+      socket-timeout-millis: 60000
+   routes:
+      user: 
+         path: /api/user/**
+         serviceId: user-service
+         stripPrefix: false
+      training: 
+         path: /api/training/**
+         serviceId: training-service
+         stripPrefix: false
+      skill: 
+         path: /api/skill/**
+         serviceId: skill-service
+         stripPrefix: false
+      search: 
+         path: /api/search/**
+         serviceId: search-service
+         stripPrefix: false
+         
+hystrix: 
+  command:
+    default:
+      execution:
+        timeout:
+          enabled: false # 停用超时设置
+        isolation:
+          thread:
+            timeoutInMilliseconds: 222000 
+ribbon:
+   ReadTimeout: 60000
+   connection-timeout: 3000
+   eureka:
+      enabled: true
+                          
+jwt:
+   secret: TOPSECRET
+   expiration: 604800
+   header: Authorization
+
+jasypt: 
+    encryptor: 
+        password: fsd
+
+---
+server:
+   port: 8000
+
+spring:
+   profiles: prod
+   application: 
+      name: gateway-service
+   datasource:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://rm-8vb5020242t0c8c43o.mysql.zhangbei.rds.aliyuncs.com:3306/fsd?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&verifyServerCertificate=false&useSSL=false&createDatabaseIfNotExist=true
+      username: ENC(xCLkxbh9Z1up2aO+TDNVGg==)
+      password: ENC(KKSdRDvWvAGy+yurps9rnnO1RxyVc6wi)
+   jpa:
+      hibernate.ddl-auto: none
+eureka:
+   client:
+      registerWithEureka: true
+      fetchRegistry: true
+      serviceUrl: 
+         defaultZone: http://eureka-server:8761/eureka/
    instance:
       leaseRenewalIntervalInSeconds: 1
       leaseExpirationDurationInSeconds: 2
